@@ -1,0 +1,69 @@
+%!TEX root = draft.tex
+\section{Introduction}
+\label{sec:introduction}
+
+
+Modern computer software is increasingly concurrent. Interactive applications
+and services necessitate reactive asynchronous operations to handle requests
+immediately as they happen, rather than waiting for long-running operations to
+complete. Furthermore, as processor manufacturers approach clock-speed limits,
+performance improvements are more-often achieved by parallelizing operations
+across multiple processor cores.
+
+%Efficient implementations of concurrent objects are essential and hard to get right. Verifying them is difficult, checking a single execution is NP-complete~\cite{journals/siamcomp/GibbonsK97} and checking a finite-state implementation is undecidable~\cite{conf/esop/BouajjaniEEH13}.
+
+%The set of objects considered in previous work consists of stacks, queues, registers.
+
+
+ Multithreaded software is typically built with specialized “concurrent
+  objects” like atomic integers, queues, maps, priority queues. These objects’ methods are
+  designed to confom to better established sequential specifications, a property known as \emph{linearizability}~\cite{journals/toplas/HerlihyW90},
+  despite being optimized to avoid blocking and exploit parallelism, e.g.,~by
+  using atomic machine instructions like compare-and-swap. Intuitively, linearizability asks that every individual operation appears to take place instantaneously at some point between its invocation and its return. Verifying linearizability is intrinsically hard, and undecidable in general~\cite{conf/esop/BouajjaniEEH13}. % (even for finite-state implementations).
+However, recent work~\cite{DBLP:conf/icalp/BouajjaniEEH15} has shown that for particular classes of objects,
+i.e., registers, mutexes, queues, and stacks, the problem of verifying linearizability becomes decidable (for finite-state implementations).
+
+In this paper, we consider another important object, namely the priority queue, which is essential for applications such as task scheduling and discrete event simulation. Numerous implementations have been proposed in the research literature, e.g.,~\cite{DBLP:conf/ppopp/AlistarhKLS15,DBLP:conf/wdag/CalciuMH14,DBLP:conf/opodis/LindenJ13,DBLP:conf/podc/ShavitZ99,DBLP:conf/ipps/ShavitL00}, and concrete implementations exist in many modern languages like C++ or Java.
+%
+%This object is much less studied compared to the other ones in the verification literature.
+%
+Priority queues are collections providing $\textit{put}$ and $\textit{rm}$ methods for adding and removing values. Every value added is associated to a priority and a remove operation returns a minimal priority value. For generality, we consider a partially-ordered set of priorities. Values with incomparable priorities can be removed in any order, and values having the same priority are removed in the FIFO order. Implementations like the PriorityBlockingQueue in Java where same priority values are removed in an arbitrary order can be modeled in our framework by renaming equal priorities to incomparable priorities (while preserving the order constraints).
+
+Compared to previously studied collections like stacks and queues, the main challenge in dealing with priority queues is that the order in which values are removed is not fixed by the happens-before between add/remove operations (e.g., in the case of a queue, the values are removed in the order in which they were inserted), but by parameters of the $\textit{put}$ operations (the priorities) which come from an unbounded domain. For instance, the sequential behavior $\textit{put}(a,p_1)\cdot \textit{put}(b,p_3)\cdot \textit{put}(c,p_2)\cdot \textit{rm}(a,p_1)\cdot \textit{rm}(c,p_2)$ where the priority $p_1$ is less than $p_2$ which is less than $p_3$, is not admitted neither by the regular queue nor the stack.
+
+%While it was proved that the violations of concurrent stacks and queues can be captured using finite-state automata~\cite{DBLP:conf/icalp/BouajjaniEEH15}, we show that characterizing the violations of the priority queue needs \emph{register automata} where registers are used to store and compare priorities.
+
+%This gives a reduction to reachability that works for arbitrary implementations, and a decision procedure for finite-state implementations
+
+Following the approach in~\cite{DBLP:conf/icalp/BouajjaniEEH15}, we give a characterization of concurrent priority queue behaviors violating linearizability in terms of automata. This characterization enables a reduction of checking linearizability for arbitrary implementations to reachability or invariant checking, and implies decidability for checking linearizability of finite-state implementations. However, differently from the case of stacks and queues where finite-state automata are sufficient, we show that the case of priority queues needs \emph{register automata} where registers are used to store and compare priorities.
+
+This characterization is obtained in several steps. We first define a recursive procedure which recognizes valid sequential executions which is then extended to recognize linearizable concurrent executions. Intuitively, for an input execution $e$, this procedure handles values occurring in $e$ one by one, starting with values of maximal priority (which are to be removed the latest). For each value $x$, it checks whether $e$ satisfies some property ``local'' to that value, i.e., which is agnostic to how the operations adding or removing other values are ordered between them (w.r.t. the happens-before), other than how they are ordered w.r.t. the operations on $x$. When this property holds, the same is done for the rest of the execution, without the operations on $x$. This procedure works only for executions where a value is added at most once, but this is not a limitation for \emph{data-independent} implementations whose behavior doesn't depend on the values that are added or removed. In fact, all the implementations that we are aware of are data-independent.
+
+Next, we show that checking whether an execution violates this ``local'' property for a value $x$ can be done using a class of register automata~\cite{DBLP:journals/tcs/KaminskiF94,DBLP:conf/icalp/Cerans94,DBLP:conf/stacs/SegoufinT11} (transition systems where the states consist of a fixed set of registers that can receive values and be compared). Actually, only two registers are needed: one register $r_1$ for storing a priority guessed at the initial state, and one register $r_2$ for reading priorities as they occur in the execution and comparing them with the one stored in $r_1$. We show that registers storing values added to or removed from the priority queue are not needed, since any data-independent implementation admits a violation to linearizability whenever it admits a violation where the number of values is constant, and at most 5 (the number of priorities can still be unbounded).
+
+The remainder of this article is organized as follows.
+Section~\ref{sec:priority queue and data-independence} describes the priority queue ADT, lists several semantic properties like data-independence that are satisfied by implementations of this ADT, and formalizes the notion of linearizability.
+Sections~\ref{sec:checking inclusion by recursive procedure} defines a recursive procedure for checking linearizability of concurrent priority queue behaviors.
+Section~\ref{sec:co-regular of extended priority queues} gives an automata characterization of the violations to linearizability, and
+Section~\ref{sec:related} discusses related work. {\color {red}Some proofs and detailed construction of register automata are deferred to the long version \cite{CONCUR2017Ahmed}.} 
+%, and
+%Section~\ref{sec:conclusion} gives concluding remarks.
+
+
+
+
+%Building on previous work~\cite{DBLP:conf/icalp/BouajjaniEEH15}, we define decision procedures for priority queues.
+%These procedures are designed in several steps:
+%1) defining recursive procedures recognizing valid sequences, and extending them to concurrent executions. These procedures take values one by one and check some property local to that value, ignoring how operations on other values are ordered between them. This works only for data-differentiated, but this is complete by data-independence.
+%2) checking whether a fixed value violates that property can be done using a specific class of register automata, TODO say how simple they are
+%3) we distinguish between that value being removed or not, and we have to also consider the case of remove(empty). This results in 3-4 automata describing all the possible violations.
+
+
+
+
+
+
+
+
+
+
