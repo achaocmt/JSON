@@ -1,0 +1,86 @@
+%!TEX root = draft.tex
+
+\section{Model of JSON}
+\label{sec:model of json}
+
+
+
+\section{Syntax of JSON}
+\label{sec:syntax of json}
+
+A \emph{cursor} $CUR$ is a ``position'' and is recursively defined as follows:
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] $doc$,
+
+\item[-] $x$ with $x \in VAR$,
+
+\item[-] $CUR.createOrGet(key)$, where $CUR$ is of map type,
+
+\item[-] $CUR.idx(i)$, where $CUR$ is of list type and $i \in \mathbb{N}$,
+\end{itemize}
+
+A \emph{command} can do the following behaviors:
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] let $x = CUR$, where $x \in VAR$,
+
+\item[-] $CUR = a$, where $v \in VAL$,
+
+\item[-] $CUR.addAfter(a)$, where $CUR$ is an element of a list type and $a \in VAL$,
+
+\item[-] $CUR.delete$, where $CUR$ is an element of a list,
+
+\item[-] $yield$,
+
+\item[-] $CUR.keys$, where $CUR$ is of map type,
+
+\item[-] $CUR.values$, where $CUR$ is of register type,
+
+\item[-] $CUR.length$, where $CUR$ is of list type,
+\end{itemize}
+
+A variable $x \in VAR$ is used to represent a shortcut of a cursor. Each variable $x$ must be initialized and it can be initialized only once.
+
+A value $a \in VAL$ is either a number, a string, or one of the following elements: $\mathit{true}$, $\mathit{false}$, $\mathit{null}$, $\{ \}$, $[ ]$.
+
+
+
+
+\section{Our First Model of JSON}
+\label{sec:our first model of json} 
+
+Given a JSON object $o$, the semantics of $o$ is given as a labeled transition system (LTS) $\llbracket o \rrbracket = (GC,\Sigma,gc_0,\rightarrow)$, where $GC$ is a set of global configurations, $\Sigma$ is the set of transition labels, $gc_0$ is the initial configuration, and $\rightarrow \subseteq GC \times \Sigma \times GC$ is the transition relation. For readability, we use $gc \xrightarrow{\alpha} gc'$ to denote a transition $(gc,\alpha,gc')\in\,\rightarrow$. 
+
+Our semantics assumes the following two properties of the propagation of operations: 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] each operation is applied at most once at each replica, and 
+
+\item[-] if the effector of operation $\ell_1$ is applied at the origin replica of $\ell_2$ before $\ell_2$ happens, then for every replica $\mathtt{r}$, the operation $\ell_2$ will be applied only after the operation $\ell_1$ has already been applied. 
+\end{itemize} 
+
+A global configuration $(\mathsf{G}, \mathsf{vis}, \mathsf{DS})$ is a
+``snapshot'' of the system that records all the operations that have
+been executed. 
+
+
+
+The transition relation between global configurations is defined in \figureautorefname~\ref{fig:crdt-opsem}.
+
+\begin{figure}
+\[
+\begin{array}{l c}
+\bigfrac{p(i)=q_1, q_1
+{\xrightarrow{\textit{read}(x,r_1)}}_{\mathcal{L}}
+q_2,r(i)=\textit{rv},d(x)=a } {(p,d,r)
+{\xrightarrow{\textit{read}(i,x,a)}}_{\textit{cs}}
+(p[i:q_2],d,r[ i:\textit{rv}[r_1:a] ])} {\textit{Read}}
+\end{array}
+\]
+\label{fig:crdt-opsem}
+\vspace{-5mm}
+\end{figure}
