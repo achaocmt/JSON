@@ -1,0 +1,250 @@
+% GP: Why do we have all these macros?
+
+\newcommand\eqdef{\stackrel{\text{def}}{=}}
+
+%\newcommand{\nondsum}{\bigbox}
+\newcommand{\nondsum}{\bigsqcupplus}
+\newcommand{\probplus}[1]{\oplus_{#1}}
+%\newcommand{\nondplus}{\square}
+\newcommand{\bang}{!\,}
+\newcommand{\nondplus}{{\textstyle\bigsqcupplus}}
+\newcommand{\partmap}{\rightharpoonup}
+\newcommand{\map}{\rightarrow}
+%\newcommand{\exc}{\phi}
+\newcommand{\exc}{\alpha}
+\newcommand{\exec}{\mathit{exec}}
+\newcommand{\execp}{\mathit{execp}}
+\newcommand{\Act}{\mathit{Act}}
+\newcommand{\Sec}{\mathit{Sec}}
+\newcommand{\Obs}{\mathit{Obs}}
+\newcommand{\etree}{\mathit{etree}}
+\newcommand{\lstate}{\mathit{lst}}
+\newcommand{\fstate}{\mathit{fst}}
+%\newcommand{\STATE}{\mathcal{P}r}  $ original marked
+%\newcommand{\STATE}{\mathcal{P}}   $ marked by me
+%\newcommand{\st}{P}
+\newcommand{\trans}{\mathcal{T}}
+\newcommand{\Aut}{\mathcal{M}}
+\newcommand{\init}{\mathit{init}}
+\newcommand{\perr}{\mathcal{P}}
+
+\newcommand{\calo}{\mathcal{O}}
+\newcommand{\cals}{\mathcal{S}}
+\newcommand{\sseq}{\vec s}
+\newcommand{\oseq}{\vec o}
+\newcommand{\ccsp}{CCS$_p$}
+
+\newcommand{\bigfrac}[2]{\frac{\raisebox{1ex}{$#1$}}{\raisebox{-1.5ex}{$#2$}}}
+\newcommand{\nondarr}[1]{\overset{#1}{\longrightarrow}}
+\newcommand{\Nondarr}[1]{\overset{#1}{\Longrightarrow}}
+\newcommand{\vectorArrow}[1]{\stackrel{\longrightarrow}{\mbox{#1}}}
+\newcommand{\probarr}[1]{\overset{#1}{\dashrightarrow}}
+\newcommand{\paral}{\,|\,}
+\newcommand{\outp}[1]{\overline{#1}}
+\renewcommand{\Pr}{{\rm Pr}}
+
+%Commands by Chao Wang
+
+%memory models%
+\newcommand{\TSO}{\textrm{TSO}}
+\newcommand{\PSO}{\textrm{PSO}}
+
+%correctness conditions%
+\newcommand{\lin}{\textrm{linearizability}}
+\newcommand{\slin}{\textrm{static linearizability}}
+\newcommand{\qlin}{\textrm{quasi linearizability}}
+\newcommand{\TTlin}{\textrm{TSO-to-TSO linearizability}}
+
+\newcommand{\pair}[2]{\langle #1 , #2 \rangle}% pairs
+\newcommand{\setof}[2]{\{ \, #1 \mid #2 \, \}}% Sets
+\newcommand{\set}[1]{\{ {#1}  \}  }
+%\newcommand{\map}[3]{{#1} \colon {#2} \longmapsto {#3}} %functions
+\newcommand{\den}[1]{[\![#1]\!]}% Denotation of
+\newcommand{\mean}[1]{|\!|#1|\!|}
+\newcommand{\forget}[1]{}
+
+%%%%%%%%%%%%%GENERAL%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\itbox}[1]{{\it #1\/}}
+\newcommand{\un}[1]{\uline{#1}}%\underline{#1}}
+\newcommand{\ov}[1]{\overline{#1}}
+\newcommand{\smallspace}{\vspace{10mm}}
+\newcommand{\is}{\mbox{$\Longleftarrow\ $}}
+\newcommand{\pright}[1]{\hfill{#1}}
+\newcommand{\bnfor}{\;\;\mid\;\;}
+
+\newcommand{\ar}[1]{\stackrel{\scriptstyle #1}{\longrightarrow}}
+
+%%%%%%%%%italics in math mode
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newcommand{\true}{{\it true}}
+%\newcommand{\false}{{\it false}}
+\newcommand{\calB}{{\cal B}}
+\newcommand{\calF}{{\cal F}}
+\newcommand{\calP}{{\cal P}}
+\newcommand{\order}{{\cal O}}
+\newcommand{\size}[1]{|#1|}
+
+%other notations%
+\newcommand{\LTS}{\textit{LTS}}
+\newcommand{\bedt}[1]{{\color{blue}#1}}
+\newcommand{\redt}[1]{{\color{red}#1}}
+
+\newcommand{\todo}[1]{{\bf \color{red}{#1}}}
+
+%%%%%%%%%%%%% CRDTs %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\crdtlin}{RA-linearizability}
+\newcommand{\crdtlinearization}{RA-linearization}
+\newcommand{\crdtlinearizable}{RA-linearizable}
+\newcommand{\CRDTLin}{Replication-Aware Linearizability}
+\newcommand{\CRDTLinshort}{RA\text{-}Linearizability}
+
+\newcommand{\hwlin}{{\color{magenta} hw-linearizability}}
+\newcommand{\hwlinear}{{\color{magenta} hw-linear}}
+\newcommand{\hwlinearization}{{\color{magenta} hw-linearization}}
+\newcommand{\hwlinearizable}{{\color{magenta} hw-linearizable}}
+\newcommand{\HWLin}{{\color{magenta} HW-Linearizability}}
+
+
+
+%%%%%%%%%%%%% CRDTs %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\aobj}{\ensuremath{\mathtt{o}}}
+\newcommand{\ahist}{\ensuremath{{h}}}
+\newcommand{\objs}{\ensuremath{\mathbb{O}}}
+\newcommand{\acts}{\ensuremath{\mathbb{A}}}
+\newcommand{\aact}{\ensuremath{a}}
+\newcommand{\arep}{\ensuremath{\mathtt{r}}}
+\newcommand{\reps}{\ensuremath{\mathbb{R}}}
+\newcommand{\amethod}{\ensuremath{\mathsf{m}}}
+\newcommand{\ainput}{\ensuremath{\mathsf{a}}}
+\newcommand{\areturn}{\ensuremath{\mathsf{r}}}
+\newcommand{\tsof}{\ensuremath{\mathsf{ts}}}
+\newcommand{\atimestamp}{\ensuremath{\mathsf{t}}}
+\newcommand{\methods}{\ensuremath{\mathbb{M}}}
+\newcommand{\histories}{\ensuremath{\mathbb{H}\mathsf{ist}}}
+\newcommand{\traces}{\ensuremath{\mathbb{T}\mathsf{r}}}
+\newcommand{\datadomain}{\ensuremath{\mathbb{D}}}
+\newcommand{\timestampdomain}{\ensuremath{\mathbb{T}}}
+\newcommand{\acrdttyp}{\ensuremath{\mathsf{t}}}
+\newcommand{\amethodset}{\ensuremath{\mathsf{M}}}
+\newcommand{\adomain}{\ensuremath{\mathsf{D}}}
+\newcommand{\atsdomain}{\ensuremath{\mathsf{T}}}
+\newcommand{\powerset}[1]{\ensuremath{\mathcal{P}(#1)}}
+\newcommand{\astate}{\ensuremath{\sigma}}
+\newcommand{\abstate}{\ensuremath{\phi}}
+\newcommand{\abstates}{\ensuremath{\Phi}}
+\newcommand{\states}{\ensuremath{\Sigma}}
+\newcommand{\amesg}{\ensuremath{\mathsf{m}}}
+\newcommand{\messages}{\ensuremath{\mathcal{M}\mathsf{sg}}}
+\newcommand{\amesgset}{\ensuremath{\mathsf{M}}}
+\newcommand{\aop}{\ensuremath{\mathsf{op}}}
+\newcommand{\ops}{\ensuremath{\mathbb{O}\mathsf{ps}}}
+\newcommand{\aopid}{\ensuremath{\aop_{\mathsf{id}}}}
+\newcommand{\opids}{\ensuremath{\mathbb{O}\textsf{p}\mathsf{ID}}}
+\newcommand{\argv}{\ensuremath{a}}
+\newcommand{\retv}{\ensuremath{b}}
+\newcommand{\alabellong}[3][\amethod]{\ensuremath{#1(#2) \Rightarrow #3}}
+\newcommand{\alabelshort}[2][\amethod]{\ensuremath{#1(#2)}}
+\newcommand{\alabellongind}[4][\amethod]{\ensuremath{#1(#2) \overset{#4}{\Rightarrow}
+    #3}}
+\newcommand{\alabelobjind}[4][{\aobj.\amethod}]{\ensuremath{{#1}(#2) \overset{#4}{\Rightarrow}
+    #3}}
+\newcommand{\src}[2]{\ensuremath{\mathsf{gen}_{#1}(#2)}}
+\newcommand{\dwn}[2]{\ensuremath{\mathsf{eff}_{#1}(#2)}}
+\newcommand{\atsm}[1]{\mathsf{tsm}_{#1}}
+
+\newcommand{\alabel}{\ensuremath{\ell}}
+\newcommand{\refmap}{\ensuremath{\mathsf{abs}}}
+\newcommand{\firstrep}{\ensuremath{\mathsf{qry}}}
+\newcommand{\secondrep}{\ensuremath{\mathsf{upd}}}
+\newcommand{\specOrSet}{\ensuremath{\Spec(\text{OR\text{-}Set})}}
+\newcommand{\specTwoPSet}{\ensuremath{\Spec(\text{2P\text{-}Set})}}
+\newcommand{\specLWWSet}{\ensuremath{\Spec(\text{LWW\text{-}Set})}}
+\newcommand{\specReg}{\ensuremath{\Spec(\text{Reg})}}
+\newcommand{\specMVReg}{\ensuremath{\Spec(\text{MV\text{-}Reg})}}
+\newcommand{\specCounter}{\ensuremath{\Spec(\text{Counter})}}
+\newcommand{\specRGA}{\ensuremath{\Spec(\text{RGA})}}
+\newcommand{\specWooki}{\ensuremath{\Spec(\text{Wooki})}}
+\newcommand{\specAddatOne}{\ensuremath{\Spec(\text{addAt1})}}
+\newcommand{\specAddatTwo}{\ensuremath{\Spec(\text{addAt2})}}
+\newcommand{\specAddatThree}{\ensuremath{\Spec(\text{addAt3})}}
+\newcommand{\labels}{\ensuremath{\mathbb{L}}}
+\newcommand{\labelsspec}[1]{\ensuremath{\mathbb{L}\mathsf{ab}({#1})}}
+\newcommand{\labelsspecrd}[1]{\ensuremath{\mathbb{L}\mathsf{ab}_{\mathsf{rd}}({#1})}}
+\newcommand{\labelsspecmod}[1]{\ensuremath{\mathbb{L}\mathsf{ab}_{\mathsf{mod}}({#1})}}
+\newcommand{\alabelset}{\ensuremath{\mathsf{L}}}
+\newcommand{\arepord}{\ensuremath{\mathsf{ro}}}
+\newcommand{\avisord}{\ensuremath{\mathsf{vis}}}
+\newcommand{\atsord}[1]{\ensuremath{\prec_{#1}}}
+\newcommand{\aseqord}{\ensuremath{\mathsf{seq}}}
+\newcommand{\alinord}{\ensuremath{\mathsf{lin}}}
+\newcommand{\absopsemplain}{\ensuremath{\Rightarrow}}
+\newcommand{\absopsem}[2][\alabel]{\ensuremath{\delta_{#1}(#2)}}
+\newcommand{\apre}{\ensuremath{\mathsf{pre}}}
+\newcommand{\comp}{\ensuremath{\otimes}}
+
+
+\newcommand{\atrace}{\ensuremath{\mathit{tr}}}
+\newcommand{\hist}[1]{\ensuremath{\mathit{h}({#1)}}}
+\newcommand{\Spec}{\ensuremath{\mathsf{Spec}}}
+\newcommand{\updates}{\ensuremath{\mathsf{Updates}}}
+\newcommand{\queries}{\ensuremath{\mathsf{Queries}}}
+\newcommand{\Updates}{\ensuremath{\mathsf{Updates}}}
+\newcommand{\Queries}{\ensuremath{\mathsf{Queries}}}
+\newcommand{\queryupdates}{\ensuremath{\mathsf{Query\text{-}Updates}}}
+
+\newcommand{\effector}{\ensuremath{\delta}}
+\newcommand{\semop}[2][\aop]{\ensuremath{\llbracket #1
+    \rrbracket}\ifthenelse{\isempty{#2}}{}{(#2)}}
+\newcommand{\localstates}{\ensuremath{\mathsf{LC}}}
+\newcommand{\globalstates}{\ensuremath{\mathsf{GC}}}
+\newcommand{\gstates}{\ensuremath{\mathsf{G}}}
+\newcommand{\dom}[1]{\ensuremath{\mathsf{dom}(#1)}}
+\newcommand{\labeldom}[1]{\ensuremath{\mathsf{labels}(#1)}}
+\newcommand{\downstreams}{\ensuremath{\mathsf{DS}}} 
+\newcommand{\msgs}{\ensuremath{\mathsf{Ms}}} 
+\newcommand{\vmsgs}{\ensuremath{\mathsf{VMs}}}
+
+\newcommand{\specarrow}[1]{\xhookrightarrow{#1}}
+
+
+
+\newcommand{\alabellongNoret}[2][\amethod]{\ensuremath{#1(#2)}} % m(a)
+
+\newcommand{\alabellongNoArg}[2][\amethod]{\ensuremath{#1 \Rightarrow
+    #2}} % m() \Rightarrow b
+
+\newcommand{\ats}{\ensuremath{ts}} % a timestamp
+\newcommand{\tss}{\ensuremath{\mathbb{T}\mathsf{s}}} % set of timestamps
+\newcommand{\atsource}{\ensuremath{\theta}} % atsource
+\newcommand{\aglobalstate}{\ensuremath{\mathtt{gc}}} % a global state
+\newcommand{\aexec}{\ensuremath{\mathtt{e}}} % an execution
+\newcommand{\ahis}{\ensuremath{\mathtt{h}}} % a history
+\newcommand{\tzerolin}{t0-linearizability} % t0-linearizability
+\newcommand{\tzerolinearization}{t0-linearization} % t0-linearization
+\newcommand{\tzerolinearizable}{t0-linearizable} % t0-linearizable
+\newcommand{\tonelin}{t1-linearizability} % t1-linearizability
+\newcommand{\tonelinearization}{t1-linearization} % t1-linearization
+\newcommand{\tonelinearizable}{t1-linearizable} % t1-linearizable
+
+\newcommand{\tzerospec}{t0-specification} % t0-specification
+\newcommand{\tonespec}{t1-specification} % t0-specification
+
+\newcommand{\crdtimp}{crdt-implementation} % crdt-implementation
+\newcommand{\gts}{global-timestamp} % a global-timestamp
+\newcommand{\gtss}{\ensuremath{\mathbb{G}\mathsf{ts}}} % global-timestamps
+\newcommand{\updategts}{\ensuremath{updGTs}} % update global-timestamp
+\newcommand{\rupdategts}{\ensuremath{rupdGTs}} % update global-timestamp with a random value
+\newcommand{\funobjtostates}{\ensuremath{\sigma}\ensuremath{s}} % a function from object to lobal states
+\newcommand{\severalobj}{\ensuremath{\mathtt{os}}} % a set of objects
+\newcommand{\mobj}[1]{\ensuremath{\mathsf{modify}(#1)}} % modify a object where use random update timestamp
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\gconfres}{\ensuremath{\mathsf{gcr}}} % a function for global conflict resolution. This is used for non-determnistic sequential specification
+\newcommand{\igconfres}{\ensuremath{\mathsf{igcr}}} % a function for global conflict resolution in implementation. This is used for non-determnistic sequential specification
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

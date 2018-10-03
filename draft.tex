@@ -1,216 +1,229 @@
-\documentclass[a4paper,UKenglish]{lipics-v2016}
+%% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
 
-%\newtheorem{theorem}{Theorem}[section]
-%\newtheorem{conjecture}[theorem]{Conjecture}
-%\newtheorem{corollary}[theorem]{Corollary}
-%\newtheorem{proposition}[theorem]{Proposition}
-%\newtheorem{lemma}[theorem]{Lemma}
-%\newdef{definition}[theorem]{Definition}
-%\newdef{remark}[theorem]{Remark}
-%\newdef{example}[theorem]{Example}
+% \documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+
+%% For double-blind review submission, w/ CCS and ACM Reference
+%\documentclass[acmsmall,review,anonymous]{acmart}\settopmatter{printfolios=true}
+%% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
+%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%% For single-blind review submission, w/ CCS and ACM Reference
+%\documentclass[acmsmall,review]{acmart}\settopmatter{printfolios=true}
+%% For final camera-ready submission, w/ required CCS and ACM Reference
+%\documentclass[acmsmall]{acmart}\settopmatter{}
 
 
+%% Journal information
+%% Supplied to authors by publisher for camera-ready submission;
+%% use defaults for review submission.
+\acmJournal{PACMPL}
+\acmVolume{1}
+\acmNumber{CONF} % CONF = POPL or ICFP or OOPSLA
+\acmArticle{1}
+\acmYear{2018}
+\acmMonth{1}
+\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission;
+%% use 'none' for review submission.
+\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2018}           %% If different from \acmYear
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%% Note: author/year citations are required for papers published as an
+%% issue of PACMPL.
+\citestyle{acmauthoryear}   %% For author/year citations
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Note: Authors migrating a paper from PACMPL format to traditional
+%% SIGPLAN proceedings format must update the '\documentclass' and
+%% topmatter commands above; see 'acmart-sigplanproc-template.tex'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+
+
+% \documentclass{llncs}
+% \usepackage[english]{babel}
+
+\usepackage{hyperref}
 
 \usepackage{epsfig}
-\usepackage{amsmath}
+% \usepackage{amsmath}
 \usepackage{color}
 \usepackage{amsfonts,amssymb}
-%\usepackage{txfonts}
-%\usepackage{pxfonts}
-%\usepackage{mathabx}
-%\usepackage{makeidx}  % allows for indexgeneration
+% \usepackage{mathabx}
 \usepackage{verbatim}
-%\usepackage{url}
-%\usepackage{hyperref}
 \usepackage{times}
-\usepackage{ulem}    %(\emph{....} in the texfile) is underlined instead of italic
-\normalem
-\usepackage{enumerate}
-%\usepackage[square, comma, sort&compress, numbers]{natbib}
-
-%added by Yi Lv%
-%\usepackage[linesnumbered,ruled,procnumbered,noend]{algorithm2e}
-%\usepackage[linesnumbered,ruled,procnumbered,vlined]{algorithm2e}
 \usepackage[linesnumbered,ruled,procnumbered,noend]{algorithm2e}
 \usepackage{stmaryrd}
-%\usepackage{hyperref}
+
 %added by Wang Chao%
 %\usepackage{mathrsfs}
 %\usepackage{extarrows}
-\usepackage{thmtools}
+\usepackage{thmtools,mathtools}
 \usepackage{thm-restate}
 
 %add for TIkz
 \usepackage[version=0.96]{pgf}
 \usepackage{tikz}
 \usetikzlibrary{arrows,shapes,snakes,automata,backgrounds,petri}
-%\usepackage[latin1]{inputenc}
-%\usepackage{placeins}
-%\usepackage[bookmarks=false]{hyperref}
-
-%\declaretheorem[name=Claim]{clm}
-%\declaretheorem[name=Lemma]{lem}
-%\declaretheorem[name=Theorem]{thm} 
+\usepackage{xcolor}
+\usepackage{paralist}
+\usepackage{xifthen,hhline}
+\usepackage{mathpartir}
+% \usepackage{extpfeil}
 
 
+\usepackage{wrapfig}
 
+\def\sectionautorefname{Sec.}%
+\def\figureautorefname{Fig.}%
+\def\subsectionautorefname{Sec.}%
+% \def\lstlistingautorefname{List.}%
+% \providecommand*{\lstlistingautorefname}{List.}
+% \providecommand*{\listingautorefname}{List.}
 
+\usepackage{listings}
 
+\lstset{
+  frame=tb,
+  language=Python,
+  % aboveskip=3mm,
+  % belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  % basicstyle=\ttfamily\footnotesize,
+  basicstyle=\ttfamily,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3,
+  morekeywords={[1]in,upto,skip,return,let},
+  morekeywords={[2]payload, initial, downStream, atSource},
+  morekeywords={[3]precondition},
+  morecomment=[l]{//@},
+  escapeinside={@|}{|@},
+  keywordstyle=[2]\color{red},
+  keywordstyle=[3]\color{green!30!black!90},
+  deletekeywords={[2]max,list},
+  % belowcaptionskip=-15pt,
+  numbers=none,
+  morestring=[b]',
+  morestring=[b]'',
+}
+
+\usepackage[margin,draft]{fixme}
+\fxsetup{theme=color,mode=multiuser}
+\FXRegisterAuthor{gp}{agp}{GP}
+\FXRegisterAuthor{cw}{acw}{CW}
+\FXRegisterAuthor{ce}{ace}{CE}
+
+\newcommand{\gpn}[2][]{\gpnote*{#1}{#2}}
+\newcommand{\gp}[1]{\gpnote{#1}}
 
 
 \DeclareSymbolFont{largesymbolsA}{U}{txexa}{m}{n}
 \SetSymbolFont{largesymbolsA}{bold}{U}{txexa}{bx}{n}
 \DeclareFontSubstitution{U}{txexa}{m}{n}
-\DeclareMathSymbol{\bigsqcupplus}{\mathop}{largesymbolsA}{"02}
+% \DeclareMathSymbol{\bigsqcupplus}{\mathop}{largesymbolsA}{"02}
 
-% "Import" \bigsqcupplus from txfonts without loading txfonts (since
-% it changes the default font and replaces many symbols)
+\newcommand{\textblue}[1]{\color{blue}#1\color{black}}
+\newcommand{\textred}[1]{\color{red}#1\color{black}}
+\newcommand{\ce}[1]{\textred{CE: #1 }}
 
-% Commands by Catuscia
-
-%\DeclareMathOperator*{\minarg}{{\rm minarg}}
-
-%Previous notation for the probabilistic choice
-%\newcommand{\probsum}{\bigoplus}
-%\newcommand{\smallprobsum}[1]{\mkern4mu{\textstyle\circ\mkern-15.5mu\sum_{#1}\:}}
-%\newcommand{\bigprobsum}[1]{{\;\displaystyle\odot\mkern-21mu\sum_{#1}}}
-%\newcommand{\probsum}[1]{\mathchoice{\bigprobsum{#1}}{\smallprobsum{#1}}{\smallprobsum{#1}}{\smallprobsum{#1}}}
-%For the uniform distribution
-%\newcommand{\usmallprobsum}[1]{\mkern4mu{\textstyle\circ\mkern-15.5mu\sum^\mathcal{U}_{#1}\:}}
-%\newcommand{\ubigprobsum}[1]{{\;\displaystyle\odot\mkern-21mu\sum^\mathcal{U}_{#1}}}
-%\newcommand{\uprobsum}[1]{\mathchoice{\ubigprobsum{#1}}{\usmallprobsum{#1}}{\usmallprobsum{#1}}{\usmallprobsum{#1}}}
-
-%\newcommand{\nondsum}{\bigbox}
-\newcommand{\nondsum}{\bigsqcupplus}
-\newcommand{\probplus}[1]{\oplus_{#1}}
-%\newcommand{\nondplus}{\square}
-\newcommand{\bang}{!\,}
-\newcommand{\nondplus}{{\textstyle\bigsqcupplus}}
-\newcommand{\partmap}{\rightharpoonup}
-\newcommand{\map}{\rightarrow}
-%\newcommand{\exc}{\phi}
-\newcommand{\exc}{\alpha}
-\newcommand{\exec}{\mathit{exec}}
-\newcommand{\execp}{\mathit{execp}}
-\newcommand{\Act}{\mathit{Act}}
-\newcommand{\Sec}{\mathit{Sec}}
-\newcommand{\Obs}{\mathit{Obs}}
-\newcommand{\etree}{\mathit{etree}}
-\newcommand{\lstate}{\mathit{lst}}
-\newcommand{\fstate}{\mathit{fst}}
-%\newcommand{\STATE}{\mathcal{P}r}  $ original marked
-%\newcommand{\STATE}{\mathcal{P}}   $ marked by me
-%\newcommand{\st}{P}
-\newcommand{\trans}{\mathcal{T}}
-\newcommand{\Aut}{\mathcal{M}}
-\newcommand{\init}{\mathit{init}}
-\newcommand{\perr}{\mathcal{P}}
-
-\newcommand{\calo}{\mathcal{O}}
-\newcommand{\cals}{\mathcal{S}}
-\newcommand{\sseq}{\vec s}
-\newcommand{\oseq}{\vec o}
-\newcommand{\ccsp}{CCS$_p$}
-
-\newcommand{\bigfrac}[2]{\frac{\raisebox{1ex}{$#1$}}{\raisebox{-1.5ex}{$#2$}}}
-\newcommand{\nondarr}[1]{\overset{#1}{\longrightarrow}}
-\newcommand{\Nondarr}[1]{\overset{#1}{\Longrightarrow}}
-\newcommand{\vectorArrow}[1]{\stackrel{\longrightarrow}{\mbox{#1}}}
-\newcommand{\probarr}[1]{\overset{#1}{\dashrightarrow}}
-\newcommand{\paral}{\,|\,}
-\newcommand{\outp}[1]{\overline{#1}}
-\renewcommand{\Pr}{{\rm Pr}}
-
-%Commands by Chao Wang
-
-%memory models%
-\newcommand{\TSO}{\textrm{TSO}}
-\newcommand{\PSO}{\textrm{PSO}}
-
-%correctness conditions%
-\newcommand{\lin}{\textrm{linearizability}}
-\newcommand{\slin}{\textrm{static linearizability}}
-\newcommand{\qlin}{\textrm{quasi linearizability}}
-\newcommand{\TTlin}{\textrm{TSO-to-TSO linearizability}}
-
-\newcommand{\pair}[2]{\langle #1 , #2 \rangle}% pairs
-\newcommand{\setof}[2]{\{ \, #1 \mid #2 \, \}}% Sets
-\newcommand{\set}[1]{\{ {#1}  \}  }
-%\newcommand{\map}[3]{{#1} \colon {#2} \longmapsto {#3}} %functions
-\newcommand{\den}[1]{[\![#1]\!]}% Denotation of
-\newcommand{\mean}[1]{|\!|#1|\!|}
-\newcommand{\forget}[1]{}
-
-%%%%%%%%%%%%%GENERAL%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newcommand{\itbox}[1]{{\it #1\/}}
-\newcommand{\un}[1]{\uline{#1}}%\underline{#1}}
-\newcommand{\ov}[1]{\overline{#1}}
-\newcommand{\smallspace}{\vspace{10mm}}
-\newcommand{\is}{\mbox{$\Longleftarrow\ $}}
-\newcommand{\pright}[1]{\hfill{#1}}
-\newcommand{\bnfor}{\;\;\mid\;\;}
-
-\newcommand{\ar}[1]{\stackrel{\scriptstyle #1}{\longrightarrow}}
-
-%%%%%%%%%italics in math mode
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%\newcommand{\true}{{\it true}}
-%\newcommand{\false}{{\it false}}
-\newcommand{\calB}{{\cal B}}
-\newcommand{\calF}{{\cal F}}
-\newcommand{\calP}{{\cal P}}
-\newcommand{\order}{{\cal O}}
-\newcommand{\size}[1]{|#1|}
-
-%other notations%
-\newcommand{\LTS}{\textit{LTS}}
-\newcommand{\bedt}[1]{{\color{blue}#1}}
-\newcommand{\redt}[1]{{\color{red}#1}}
-
-%\pagestyle{empty}
-%\pagestyle{plain}
-
-
-%\def\lastname{Xu,Palamidessi}
-
-\title{A Module Specification, Implementation and Verification of JSON}
-
-
-%\author[1]{Ahmed Bouajjani}
-%\author[2]{Michael Emmi}
-\author[1]{Constantin Enea}
-\author[1]{Chao Wang}
-\affil[1]{Institut de Recherche en Informatique Fondamentale, \\ \texttt{\{cenea,wangch\}@irif.fr}}
-%\affil[2]{Nokia Bell Labs, \\ \texttt{michael.emmi@nokia.com}}
-
+\input{macros}
 
 \begin{document}
 
-\maketitle
+%% Title information
+\title[]{\CRDTLin{}}
+% \subtitle{Subtitle} %% \subtitle is optional
+
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+%% Author with single affiliation.
+\author{Constantin Enea}
+\affiliation{
+  % \position{Position1}
+  % \department{Department1}              %% \department is recommended
+  \institution{Université Paris Diderot}            %% \institution is required
+  % \streetaddress{Street1 Address1}
+  % \city{City1}
+  % \state{State1}
+  % \postcode{Post-Code1}
+  \country{France}                    %% \country is recommended
+}
+\email{cenea@irif.fr}          %% \email is recommended
+
+\author{Gustavo Petri}
+\affiliation{
+  % \position{Position2a}
+  % \department{Department2a}             %% \department is recommended
+  \institution{Université Paris Diderot}           %% \institution is required
+  % \streetaddress{Street2a Address2a}
+  % \city{City2a}
+  % \state{State2a}
+  % \postcode{Post-Code2a}
+  \country{France}                   %% \country is recommended
+}
+\email{gpetri@irif.fr}         %% \email is recommended
+
+\author{Chao Wang}
+\affiliation{
+  % \position{Position2a}
+  % \department{Department2a}             %% \department is recommended
+  \institution{Université Paris Diderot}           %% \institution is required
+  % \streetaddress{Street2a Address2a}
+  % \city{City2a}
+  % \state{State2a}
+  % \postcode{Post-Code2a}
+  \country{France}                   %% \country is recommended
+}
+\email{wangch@irif.fr}         %% \email is recommended
 
 \input{abstract}
 
+\maketitle
+
 \input{introduction}
 
-\input{model}
 
-%\FloatBarrier
-%  \bibliography{violin}
-%\bibliographystyle{plainurl}
 
-%\newpage
-
-%\appendix
+\bibliography{biblio,dblp}
 
 \end{document}
 
-
-
-
-
-
-
-
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+%%% reftex-default-bibliography: ("./biblio.bib")
