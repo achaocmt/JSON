@@ -1,7 +1,7 @@
 %!TEX root = draft.tex
 
-\section{Model of JSON}
-\label{sec:model of json}
+\section{Our First Model of JSON}
+\label{sec:our first model of json}
 
 
 
@@ -14,11 +14,13 @@ A \emph{cursor} $CUR$ is a ``position'' and is recursively defined as follows:
 \setlength{\itemsep}{0.5pt}
 \item[-] $doc$,
 
-\item[-] $x$ with $x \in VAR$,
+\item[-] $x$ with $x \in VAR$, 
 
-\item[-] $CUR.createOrGet(key)$, where $CUR$ is of map type,
+\item[-] $CUR.get(key)$, where $CUR$ is of type map,  
 
-\item[-] $CUR.idx(i)$, where $CUR$ is of list type and $i \in \mathbb{N}$,
+\item[-] $CUR.create(key, type)$, where $CUR$ is of type map, 
+
+\item[-] $CUR.idx(i)$, where $CUR$ is of type list and $i \in \mathbb{N}$. 
 \end{itemize}
 
 A \emph{command} can do the following behaviors:
@@ -31,15 +33,17 @@ A \emph{command} can do the following behaviors:
 
 \item[-] $CUR.addAfter(a)$, where $CUR$ is an element of a list type and $a \in VAL$,
 
-\item[-] $CUR.delete$, where $CUR$ is an element of a list,
+\item[-] $CUR.delete$, where $CUR$ is an element of a list or an element of a map,  
 
 \item[-] $yield$,
 
-\item[-] $CUR.keys$, where $CUR$ is of map type,
+\item[-] $CUR.keys$, where $CUR$ is of type map, 
 
-\item[-] $CUR.values$, where $CUR$ is of register type,
+\item[-] $CUR.values$, where $CUR$ is of type register, 
 
-\item[-] $CUR.length$, where $CUR$ is of list type,
+\item[-] $CUR.length$, where $CUR$ is of type list, 
+
+\item[-] $CUR.type$, which returns a type in $\{ \mathit{reg}, \mathit{map}, \mathit{list} \}$. 
 \end{itemize}
 
 A variable $x \in VAR$ is used to represent a shortcut of a cursor. Each variable $x$ must be initialized and it can be initialized only once.
