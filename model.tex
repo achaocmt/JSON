@@ -8,19 +8,19 @@
 \section{Syntax of JSON}
 \label{sec:syntax of json}
 
-A \emph{cursor} $CUR$ is a ``position'' and is recursively defined as follows:
+A \emph{cursor} $CUR$ is a ``position of the JSON tree'' and essentially points to an object. Each $CUR$ has a type. $CUR$ is recursively defined as follows: 
 
 \begin{itemize}
 \setlength{\itemsep}{0.5pt}
 \item[-] $doc$,
 
-\item[-] $x$ with $x \in VAR$, 
+\item[-] $x$ with $x \in VAR$,
 
-\item[-] $CUR.get(key)$, where $CUR$ is of type map,  
+\item[-] $CUR.get(key)$, where $CUR$ is of type map,
 
-\item[-] $CUR.create(key, type)$, where $CUR$ is of type map, 
+\item[-] $CUR.create(key, type, value)$, where $CUR$ is of type map, $key$ is the key of the ``newly generated cell'', $type \in \{ \mathit{reg}, \mathit{map}, \mathit{list} \}$ is the type of this cell, and $value$ is the initial value of this cell,  
 
-\item[-] $CUR.idx(i)$, where $CUR$ is of type list and $i \in \mathbb{N}$. 
+\item[-] $CUR.idx(i)$, where $CUR$ is of type list and $i \in \mathbb{N}$.
 \end{itemize}
 
 A \emph{command} can do the following behaviors:
@@ -33,43 +33,50 @@ A \emph{command} can do the following behaviors:
 
 \item[-] $CUR.addAfter(a)$, where $CUR$ is an element of a list type and $a \in VAL$,
 
-\item[-] $CUR.delete$, where $CUR$ is an element of a list or an element of a map,  
+\item[-] $CUR.delete$, where $CUR$ is an element of a list or an element of a map,
 
 \item[-] $yield$,
 
-\item[-] $CUR.keys$, where $CUR$ is of type map, 
+\item[-] $CUR.keys$, where $CUR$ is of type map,
 
-\item[-] $CUR.values$, where $CUR$ is of type register, 
+\item[-] $CUR.values$, where $CUR$ is of type register,
 
-\item[-] $CUR.length$, where $CUR$ is of type list, 
+\item[-] $CUR.length$, where $CUR$ is of type list,
 
-\item[-] $CUR.type$, which returns a type in $\{ \mathit{reg}, \mathit{map}, \mathit{list} \}$. 
+\item[-] $CUR.type$, which returns a type in $\{ \mathit{reg}, \mathit{map}, \mathit{list} \}$.
 \end{itemize}
 
 A variable $x \in VAR$ is used to represent a shortcut of a cursor. Each variable $x$ must be initialized and it can be initialized only once.
 
-A value $a \in VAL$ is either a number, a string, or one of the following elements: $\mathit{true}$, $\mathit{false}$, $\mathit{null}$, $\{ \}$, $[ ]$.
+A value $a \in VAL$ is either a number, a string, or one of the following elements: $\mathit{true}$, $\mathit{false}$, $\mathit{null}$, $\{ \}$, $[ ]$. 
+
+Here we require the user to guarantee that the keys of a map is unique. 
 
 
 
 
 \section{Our First Model of JSON}
-\label{sec:our first model of json} 
+\label{sec:our first model of json}
 
-Given a JSON object $o$, the semantics of $o$ is given as a labeled transition system (LTS) $\llbracket o \rrbracket = (GC,\Sigma,gc_0,\rightarrow)$, where $GC$ is a set of global configurations, $\Sigma$ is the set of transition labels, $gc_0$ is the initial configuration, and $\rightarrow \subseteq GC \times \Sigma \times GC$ is the transition relation. For readability, we use $gc \xrightarrow{\alpha} gc'$ to denote a transition $(gc,\alpha,gc')\in\,\rightarrow$. 
+Given a JSON object $o$, the semantics of $o$ is given as a labeled transition system (LTS) $\llbracket o \rrbracket = (GC,\Sigma,gc_0,\rightarrow)$, where $GC$ is a set of global configurations, $\Sigma$ is the set of transition labels, $gc_0$ is the initial configuration, and $\rightarrow \subseteq GC \times \Sigma \times GC$ is the transition relation. For readability, we use $gc \xrightarrow{\alpha} gc'$ to denote a transition $(gc,\alpha,gc')\in\,\rightarrow$.
 
-Our semantics assumes the following two properties of the propagation of operations: 
+%Our semantics assumes the following two properties of the propagation of operations:
 
-\begin{itemize}
-\setlength{\itemsep}{0.5pt}
-\item[-] each operation is applied at most once at each replica, and 
+%\begin{itemize}
+%\setlength{\itemsep}{0.5pt}
+%\item[-] each operation is applied at most once at each replica, and
 
-\item[-] if the effector of operation $\ell_1$ is applied at the origin replica of $\ell_2$ before $\ell_2$ happens, then for every replica $\mathtt{r}$, the operation $\ell_2$ will be applied only after the operation $\ell_1$ has already been applied. 
-\end{itemize} 
+%\item[-] if the effector of operation $\ell_1$ is applied at the origin replica of $\ell_2$ before $\ell_2$ happens, then for every replica $\mathtt{r}$, the operation $\ell_2$ will be applied only after the operation $\ell_1$ has already been applied.
+%\end{itemize} 
 
-A global configuration $(\mathsf{G}, \mathsf{vis}, \mathsf{DS})$ is a
-``snapshot'' of the system that records all the operations that have
-been executed. 
+
+
+
+
+
+
+
+A global configuration $(\mathsf{G}, \mathsf{vis}, \mathsf{DS})$ is a ``snapshot'' of the system that records all the operations that have been executed. 
 
 
 
@@ -80,11 +87,43 @@ The transition relation between global configurations is defined in \figureautor
 \begin{array}{l c}
 \bigfrac{p(i)=q_1, q_1
 {\xrightarrow{\textit{read}(x,r_1)}}_{\mathcal{L}}
-q_2,r(i)=\textit{rv},d(x)=a } {(p,d,r)
+q_2,r(i)=\textit{rv},d(x)=a, 
+x = y } {(p,d,r)
 {\xrightarrow{\textit{read}(i,x,a)}}_{\textit{cs}}
 (p[i:q_2],d,r[ i:\textit{rv}[r_1:a] ])} {\textit{Read}}
 \end{array}
 \]
 \label{fig:crdt-opsem}
 \vspace{-5mm}
-\end{figure}
+\end{figure} 
+
+% \gpnote[inline, nomargin]{Add an intuitive notion of history.}
+% (adapted from~\cite{ShapiroPBZ11})
+\begin{figure}[t]
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,caption={\vspace{-1mm}Replicated Growing Array (RGA) CRDT pseudo-code.},captionpos=b,label={lst:rga}]
+  payload Ti-Tree N, Set Tomb
+  initial N = @|$\emptyset$|@, Tomb = @|$\emptyset$|@
+  //@ initial lin = @|$\epsilon$|@
+
+  addAfter(a,b) :
+    atSource :
+      precondition : a = @|$\circ$|@ or (a != @|$\circ$|@ and (_,_,a) @|$\in$|@ N and a @|$\not\in$|@ Tomb)
+      let ts@|$_{\mathtt{b}}$|@ = getTimestamp()
+      //@ lin = insert(lin, addAfter(a,b), ts@|$_{\mathtt{b}}$|@)
+    downStream(a, ts@|$_{\mathtt{b}}$|@, b) :
+      N = N @|$\cup$|@ {(a, ts@|$_{\mathtt{b}}$|@, b)}
+      //@ N' = N @|$\cup$|@ {(a, ts@|$_{\mathtt{b}}$|@, b)}
+  remove(a) :
+    atSource :
+      precondition : (_,_,a) @|$\in$|@ N and a @|$\notin$|@ Tomb
+      //@ lin = insert(lin, remove(a), max(@|$\{\tsof(\alabel)\ |\ \alabel\in \alabelset\}$|@))
+    downStream(a) :
+      Tomb = Tomb @|$\cup$|@ {a}
+      //@ Tomb' = Tomb @|$\cup$|@ {a}
+  read() :
+    let ret-list = traverse(N, Tomb)
+    //@ lin = insert(lin, read()@|$\Rightarrow$|@ret-list, max(@|$\{\tsof(\alabel)\ |\ \alabel\in \alabelset\}$|@))
+    return ret-list
+\end{lstlisting}
+\vspace{-5mm}
+\end{figure} 
