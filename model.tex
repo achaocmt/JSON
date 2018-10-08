@@ -8,49 +8,51 @@
 \section{Syntax of JSON}
 \label{sec:syntax of json}
 
-A \emph{cursor} $CUR$ is a ``position of the JSON tree'' and essentially points to an object. Each $CUR$ has a type. $CUR$ is recursively defined as follows: 
+A command language $CMD$ is recursively defined as follows:
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] let $\avar = EXPR$, where $\avar \in \vars$,
+
+\item[-] $EXPR = v$, where $v \in VAL$,
+
+\item[-] $EXPR.addAfter(v)$, where $EXPR$ is an element of a list and $v \in VAL$,
+
+\item[-] $EXPR.delete$, where $EXPR$ is an element of a list or an element of a map,
+
+\item[-] $yield$,
+
+\item[-] $EXPR.create(key,type)$, where $EXPR$ is a map,
+
+\item[-] $EXPR.keys$, where $EXPR$ is a map,
+
+\item[-] $EXPR.length$, where $EXPR$ is a list,
+
+\item[-] $EXPR.values$, where $EXPR$ is a register,
+
+\item[-] $EXPR.type$,
+
+\item[-] $CMD; CMD$,
+\end{itemize}
+
+A \emph{cursor} $EXPR$ essentially points to an object of JSON, and such object has type. $EXPR$ is recursively defined as follows:
 
 \begin{itemize}
 \setlength{\itemsep}{0.5pt}
 \item[-] $doc$,
 
-\item[-] $x$ with $x \in VAR$,
+\item[-] $\avar$, where $\avar \in \vars$,
 
-\item[-] $CUR.get(key)$, where $CUR$ is of type map,
+\item[-] $EXPR.get(key)$, where $EXPR$ is a map,
 
-\item[-] $CUR.create(key, type, value)$, where $CUR$ is of type map, $key$ is the key of the ``newly generated cell'', $type \in \{ \mathit{reg}, \mathit{map}, \mathit{list} \}$ is the type of this cell, and $value$ is the initial value of this cell,  
-
-\item[-] $CUR.idx(i)$, where $CUR$ is of type list and $i \in \mathbb{N}$.
+\item[-] $EXPR.idx(i)$, where $EXPR$ is a list and $i \in \mathbb{N}$.
 \end{itemize}
 
-A \emph{command} can do the following behaviors:
+%A variable $x \in VAR$ is used to represent a shortcut of a cursor. Each variable $x$ must be initialized and it can be initialized only once.
 
-\begin{itemize}
-\setlength{\itemsep}{0.5pt}
-\item[-] let $x = CUR$, where $x \in VAR$,
+A value $a \in VAL$ is either a number, a string, or one of the following elements: $\mathit{true}$, $\mathit{false}$, $\mathit{null}$, $\{ \}$, $[ ]$.
 
-\item[-] $CUR = a$, where $v \in VAL$,
 
-\item[-] $CUR.addAfter(a)$, where $CUR$ is an element of a list type and $a \in VAL$,
-
-\item[-] $CUR.delete$, where $CUR$ is an element of a list or an element of a map,
-
-\item[-] $yield$,
-
-\item[-] $CUR.keys$, where $CUR$ is of type map,
-
-\item[-] $CUR.values$, where $CUR$ is of type register,
-
-\item[-] $CUR.length$, where $CUR$ is of type list,
-
-\item[-] $CUR.type$, which returns a type in $\{ \mathit{reg}, \mathit{map}, \mathit{list} \}$.
-\end{itemize}
-
-A variable $x \in VAR$ is used to represent a shortcut of a cursor. Each variable $x$ must be initialized and it can be initialized only once.
-
-A value $a \in VAL$ is either a number, a string, or one of the following elements: $\mathit{true}$, $\mathit{false}$, $\mathit{null}$, $\{ \}$, $[ ]$. 
-
-Here we require the user to guarantee that the keys of a map is unique. 
 
 
 
@@ -58,72 +60,262 @@ Here we require the user to guarantee that the keys of a map is unique.
 \section{Our First Model of JSON}
 \label{sec:our first model of json}
 
-Given a JSON object $o$, the semantics of $o$ is given as a labeled transition system (LTS) $\llbracket o \rrbracket = (GC,\Sigma,gc_0,\rightarrow)$, where $GC$ is a set of global configurations, $\Sigma$ is the set of transition labels, $gc_0$ is the initial configuration, and $\rightarrow \subseteq GC \times \Sigma \times GC$ is the transition relation. For readability, we use $gc \xrightarrow{\alpha} gc'$ to denote a transition $(gc,\alpha,gc')\in\,\rightarrow$.
+Given a JSON object $o$, the semantics of $o$ is given as a labeled transition system (LTS) $\llbracket o \rrbracket = (\globalstates,\acts,\aglobalstate_0,\rightarrow)$, where $\globalstates$ is a set of global configurations, $\acts$ is the set of transition labels, $\aglobalstate_0$ is the initial configuration, and $\rightarrow \subseteq \globalstates \times \acts\times \globalstates$ is the transition relation. We use the action $\src{\arep}{\alabel}$ to label the generator of $\alabel$ when executed at replica $\arep$, and $\dwn{\arep}{\alabel}$ to label the effector of $\alabel$ when executed at $\arep$. For readability, we use $\aglobalstate \xrightarrow{\aact} \aglobalstate'$ to denote a transition $(\aglobalstate,\aact,\aglobalstate')\in\,\rightarrow$.
 
-%Our semantics assumes the following two properties of the propagation of operations:
+A global configuration $(\gstates, \avisord, \downstreams)$ is defined as follows:
 
-%\begin{itemize}
-%\setlength{\itemsep}{0.5pt}
-%\item[-] each operation is applied at most once at each replica, and
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] $\gstates \in [\reps \rightarrow \localstates]$ maps each replica id into its local configuration. A local configuration $(LO, LS, LV, LL)$ contains the following information
 
-%\item[-] if the effector of operation $\ell_1$ is applied at the origin replica of $\ell_2$ before $\ell_2$ happens, then for every replica $\mathtt{r}$, the operation $\ell_2$ will be applied only after the operation $\ell_1$ has already been applied.
-%\end{itemize} 
+    \begin{itemize}
+    \setlength{\itemsep}{0.5pt}
+    \item[-] $LO \subseteq \powerset{\objids \times \types}$ contains object identifiers and their types of a replica,
 
+    \item[-] $LS: \objids \rightarrow \states$ contains the replica state of each object of a replica,
 
+    \item[-] $LV: \vars \rightarrow \objids$ maps each variable into a object,
 
+    \item[-] $LL \subseteq \labels$ is the set of operations which has been applied in a replica,
+    \end{itemize}
 
+\item[-] The relation $\avisord\subseteq \powerset{\labels \times \labels}$ is the \emph{visibility} relation between operations.
 
+\item[-] $\downstreams\in [\labels \rightarrow \Delta]$ associates to each operation label $\alabel \in LL$ an effector $\effector\in [\states \rightarrow \states]$ ($\Delta$ denotes the set of effectors).
+\end{itemize}
 
-
-
-A global configuration $(\mathsf{G}, \mathsf{vis}, \mathsf{DS})$ is a ``snapshot'' of the system that records all the operations that have been executed. 
-
-
-
-The transition relation between global configurations is defined in \figureautorefname~\ref{fig:crdt-opsem}.
-
-\begin{figure}
-\[
-\begin{array}{l c}
-\bigfrac{p(i)=q_1, q_1
-{\xrightarrow{\textit{read}(x,r_1)}}_{\mathcal{L}}
-q_2,r(i)=\textit{rv},d(x)=a, 
-x = y } {(p,d,r)
-{\xrightarrow{\textit{read}(i,x,a)}}_{\textit{cs}}
-(p[i:q_2],d,r[ i:\textit{rv}[r_1:a] ])} {\textit{Read}}
-\end{array}
-\]
-\label{fig:crdt-opsem}
-\vspace{-5mm}
-\end{figure} 
+Let $id_d$ be the object identifier for cursor $doc$. A method {\tt C2B} is defined in \figureautorefname~\ref{lst:method C2B}. $\alabellong[{\tt C2B}]{EXPR,LS,LV}{bid}{}$ is used to find the object identifier $bid$ of cursor $EXPR$.
 
 % \gpnote[inline, nomargin]{Add an intuitive notion of history.}
 % (adapted from~\cite{ShapiroPBZ11})
 \begin{figure}[t]
-\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,caption={\vspace{-1mm}Replicated Growing Array (RGA) CRDT pseudo-code.},captionpos=b,label={lst:rga}]
-  payload Ti-Tree N, Set Tomb
-  initial N = @|$\emptyset$|@, Tomb = @|$\emptyset$|@
-  //@ initial lin = @|$\epsilon$|@
-
-  addAfter(a,b) :
-    atSource :
-      precondition : a = @|$\circ$|@ or (a != @|$\circ$|@ and (_,_,a) @|$\in$|@ N and a @|$\not\in$|@ Tomb)
-      let ts@|$_{\mathtt{b}}$|@ = getTimestamp()
-      //@ lin = insert(lin, addAfter(a,b), ts@|$_{\mathtt{b}}$|@)
-    downStream(a, ts@|$_{\mathtt{b}}$|@, b) :
-      N = N @|$\cup$|@ {(a, ts@|$_{\mathtt{b}}$|@, b)}
-      //@ N' = N @|$\cup$|@ {(a, ts@|$_{\mathtt{b}}$|@, b)}
-  remove(a) :
-    atSource :
-      precondition : (_,_,a) @|$\in$|@ N and a @|$\notin$|@ Tomb
-      //@ lin = insert(lin, remove(a), max(@|$\{\tsof(\alabel)\ |\ \alabel\in \alabelset\}$|@))
-    downStream(a) :
-      Tomb = Tomb @|$\cup$|@ {a}
-      //@ Tomb' = Tomb @|$\cup$|@ {a}
-  read() :
-    let ret-list = traverse(N, Tomb)
-    //@ lin = insert(lin, read()@|$\Rightarrow$|@ret-list, max(@|$\{\tsof(\alabel)\ |\ \alabel\in \alabelset\}$|@))
-    return ret-list
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,caption={\vspace{-1mm}Method {\tt C2B}.},captionpos=b,label={lst:method C2B}]
+  C2B(@|$EXPR$|@, @|$LS$|@, @|$LV$|@):
+    assume that @|$EXPR = a_1 \cdot \ldots \cdot a_n$|@
+    bid = some fixed initial value
+    for(i=1;i<=k;i++)
+      if(@|$a_i = obj$|@)
+        bid = @|$id_d$|@
+      else if(@|$a_i \in \vars$|@)
+        bid = @|$LV(a_i)$|@
+      else if(type(bid)=map @|$\wedge$|@ @|$a_i$|@=get(key) @|$\wedge$|@ key @|$\in$|@ @|$LS(bid).\alabelshort[{\tt keys}]{}$|@)
+        bid = @|$LS(bid).\alabelshort[{\tt get}]{key}$|@
+      else if(type(bid)=list @|$\wedge$|@ @|$a_i$|@=idx(j) @|$\wedge$|@ @|$LS(bid).\alabellong[{\tt read}]{}{b_1 \cdot \ldots \cdot b_n}{}$|@ @|$\wedge$|@ @|$j \leq n$|@)
+        bid = @|$b_j$|@
+      else if(type(bid)=list @|$\wedge$|@ @|$a_i$|@=idx(j) @|$\wedge$|@ @|$LS(bid).\alabellong[{\tt read}]{}{b_1 \cdot \ldots \cdot b_n}{}$|@ @|$\wedge$|@ @|$j > n$|@)
+        bid = @|$b_n$|@
+    return bid
 \end{lstlisting}
 \vspace{-5mm}
-\end{figure} 
+\end{figure}
+
+A method {\tt findPar} is defined in \figureautorefname~\ref{lst:method findPar}. Given a $bid$ which is an element of a list, $\alabellong[{\tt findPar}]{bid,LO,LS}{bid'}{}$ is used to find the object identifier $bid'$ of the list of $bid$.
+
+% \gpnote[inline, nomargin]{Add an intuitive notion of history.}
+% (adapted from~\cite{ShapiroPBZ11})
+\begin{figure}[t]
+\begin{lstlisting}[basicstyle=\ttfamily\scriptsize,caption={\vspace{-1mm}Method {\tt findPar}.},captionpos=b,label={lst:method findPar}]
+  findPar(bid, @|$LO$|@, @|$LS$|@):
+    for each @|$(bid',t') \in LO$|@
+      if(@|$t' = list$|@)
+        assume that @|$LS(bid').\alabellong[{\tt read}]{}{a_1 \cdot \ldots \cdot a_n}{}$|@
+          if @|$\exists$|@ j, such that @|$a_j = bid$|@
+            return @|$bid'$|@
+\end{lstlisting}
+\vspace{-5mm}
+\end{figure}
+
+The transition relation between global configurations is defined as follows:
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do let $\avar = EXPR$:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid}
+  {(\gstates, \avisord, \downstreams) \xrightarrow{} (\gstates[\arep \leftarrow (LO, LS, LV[x \leftarrow \aobjid], LL)], \avisord, \downstreams)}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR = v$ and $EXPR$ is a register:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ type(\aobjid)=reg  \\ v \neq \{ \} \\ v \neq [ ] \\ \atsource(LS(\aobjid),{\tt write},v) = (\bot,\effector,\ats) \\  \effector(LS(\aobjid)) = \astate' \\ \alabel =  \aobjid.{\ensuremath{{\tt write}(v) \overset{i,\ats}{\Rightarrow}\bot}} \\ \mathit{unique}(i) \\
+  \ats\neq\bot\implies (\,\forall \alabel'\in\alabelset.\ \tsof(\alabel') < \ats\,) \\
+  \forall \alabel'\in \labeldom{\avisord}.\ \tsof(\alabel') \neq \ats}
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO, LS[\aobjid \leftarrow \astate'],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\]
+
+In other semantics rules, when a new operation $\alabel$ is generated with identifier $i$ and timestamp $\ats$, the requirement $\mathit{unique}(i)$, $\ats\neq\bot\implies (\,\forall \alabel'\in\alabelset.\ \tsof(\alabel') < \ats\,)$ and $\forall \alabel'\in \labeldom{\avisord}.\ \tsof(\alabel') \neq \ats$ are also used. For brevity, we do not write them explicitly from now on.
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR = v$, $EXPR$ is a map and $v = \{ \}$:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ type(\aobjid)=map  \\ v = \{ \} \\ \atsource(LS(\aobjid),{\tt clear},\bot) = (\bot,\effector,\ats) \\  \effector(LS(\aobjid)) = \astate' \\ \alabel =  \aobjid.{\ensuremath{{\tt clear}() \overset{i,\ats}{\Rightarrow}\bot}} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO, LS[\aobjid \leftarrow \astate'],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR = v$, $EXPR$ is a list and $v = [ ]$:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ type(\aobjid)=list  \\ v = [ ] \\ \atsource(LS(\aobjid),{\tt clear},\bot) = (\bot,\effector,\ats) \\  \effector(LS(\aobjid)) = \astate' \\ \alabel =  \aobjid.{\ensuremath{{\tt clear}() \overset{i,\ats}{\Rightarrow}\bot}} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO, LS[\aobjid \leftarrow \astate'],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.\alabelshort[{\tt addAfter}]{v}$, and $v = \{ \}$: Let $\astate_{m0}$ be the initial replica state of map object.
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid_1 \\ \alabellong[{\tt findPar}]{\aobjid_1,LO,LS}{\aobjid_2}{} \\ \atsource(LS(\aobjid_2),{\tt addAfter},\aobjid_1) = (\bot,\effector,\ats) \\ \effector(LS(\aobjid_2)) = \astate' \\ \aobjid_3 = genBID() \\ \alabel =  \aobjid_2.{\ensuremath{{\tt addAfter}(\aobjid_1,\aobjid_3) \overset{i,\ats}{\Rightarrow}\bot}} \\ v = \{ \} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO \cup \{ (\aobjid_3,map) \}, LS[\aobjid_2 \leftarrow \astate',\aobjid_3 \leftarrow \astate_{m0}],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \\ \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.\alabelshort[{\tt addAfter}]{v}$, and $v = [ ]$: Let $\astate_{l0}$ be the initial replica state of list object.
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid_1 \\ \alabellong[{\tt findPar}]{\aobjid_1,LO,LS}{\aobjid_2}{} \\ \atsource(LS(\aobjid_2),{\tt addAfter},\aobjid_1) = (\bot,\effector,\ats) \\ \effector(LS(\aobjid_2)) = \astate' \\ \aobjid_3 = genBID() \\ \alabel =  \aobjid_2.{\ensuremath{{\tt addAfter}(\aobjid_1,\aobjid_3) \overset{i,\ats}{\Rightarrow}\bot}} \\ v = [ ] }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO \cup \{ (\aobjid_3,list) \}, LS[\aobjid_2 \leftarrow \astate',\aobjid_3 \leftarrow \astate_{l0}],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \\ \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.\alabelshort[{\tt addAfter}]{v}$, and $v \neq \{ \} \wedge v \neq [ ]$: Let $\astate_{r0}$ be the initial replica state of register object.
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid_1 \\ \alabellong[{\tt findPar}]{\aobjid_1,LO,LS}{\aobjid_2}{} \\ \atsource(LS(\aobjid_2),{\tt addAfter},\aobjid_1) = (\bot,\effector_1,\ats_1) \\ \effector_1(LS(\aobjid_2)) = \astate_1 \\ \aobjid_3 = genBID() \\ \alabel_1 =  \aobjid_2.{\ensuremath{{\tt addAfter}(\aobjid_1,\aobjid_3) \overset{i_1,\ats_1}{\Rightarrow}\bot}} \\ v \neq \{ \} \\ v \neq [ ] \\ \atsource(LS(\astate_{r0},{\tt write},v) = (\bot,\effector_2,\ats_2) \\ \effector_2(\astate_{r0}) = \astate_2 \\ \alabel_2 =  \aobjid_3.{\ensuremath{{\tt write}(v) \overset{i_2,\ats_2}{\Rightarrow}\bot}} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel_1,\alabel_2}} (\gstates[\arep \leftarrow (LO \cup \{ (\aobjid_3,reg) \}, LS[\aobjid_2 \leftarrow \astate_1,\aobjid_3 \leftarrow \astate_2],LV,LL \cup \{ \alabel_1,\alabel_2 \} ) ], %\alabel
+    \\ \avisord \cup (LL \times \{\alabel_1, \alabel_2\}) \cup \{ (\alabel_1,\alabel_2) \}, \downstreams[\alabel_1 \leftarrow \effector_1, \alabel_2 \leftarrow \effector_2])}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.delete$ and $EXPR$ is an element of a list:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid_1 \\ \alabellong[{\tt findPar}]{\aobjid_1,LO,LS}{\aobjid_2}{} \\ \atsource(LS(\aobjid_2),{\tt delete},\aobjid_1) = (\bot,\effector,\ats) \\ \effector(LS(\aobjid_2)) = \astate' \\ \alabel =  \aobjid_2.{\ensuremath{{\tt delete}(\aobjid_1) \overset{i,\ats}{\Rightarrow}\bot}} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO , LS[\aobjid_2 \leftarrow \astate'],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\]
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.delete$ and $EXPR$ is an element of a map:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid_1 \\ \exists \aobjid_2,key, such \ that (type(\aobjid_2) = map \wedge LS(\aobjid_2).{\tt get}(key) = \aobjid_1) \\ \atsource(LS(\aobjid_2),{\tt remove},key) = (\bot,\effector,\ats) \\ \effector(LS(\aobjid_2)) = \astate' \\ \alabel =  \aobjid_2.{\ensuremath{{\tt remove}(key) \overset{i,\ats}{\Rightarrow}\bot}} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO , LS[\aobjid_2 \leftarrow \astate'],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\] 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.{\tt create}(key,\atype)$: Let $\astate_{\atype 0}$ be the initial replica state of type $\atype$.
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid_1 \\ type(\aobjid_1) = map \\ \aobjid_2 = getBID() \\ \atsource(LS(\aobjid_1),{\tt add},key,\aobjid_2) = (\bot,\effector,\ats) \\ \effector(LS(\aobjid_1)) = \astate' \\ \aobjid_3 = genBID() \\ \alabel =  \aobjid_1.{\ensuremath{{\tt add}(key,\aobjid_2) \overset{i,\ats}{\Rightarrow}\bot}} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\src{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO \cup \{ (\aobjid_2,\atype) \}, LS[\aobjid_1 \leftarrow \astate',\aobjid_2 \leftarrow \astate_{\atype 0}],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \\ \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])}
+\] 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ apply an effector: 
+\end{itemize} 
+
+\[
+  \inferrule[\text{\sc DownStream}]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabel \in \mathsf{min}_{\avisord}(\labeldom{\avisord} \setminus LL) \\
+    \downstreams(\alabel)= \delta \\ obj(\alabel) = \aobjid_1, \delta(LS(\aobjid_1)) = \astate_1, (\aobjid_2,\atype_2) = getObj(\alabel)}
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\dwn{\arep}{\alabel}} (\gstates[\arep \leftarrow (LO \cup \{ (\aobjid_2,\atype_2) \}, LS[\aobjid_1 \leftarrow \astate_1, \aobjid_2 \leftarrow \astate_{\atype_2 0}],LV,LL \cup \{ \alabel \} ) ], %\alabel
+    \\ \avisord \cup (LL \times \{\alabel\}), \downstreams[\alabel \leftarrow \effector])} 
+\] 
+
+Here ${\tt getObj(\alabel)}$ works as follows: If $\alabel = \_.\alabelshort[{\tt addAfter}]{a,b}$ and $b$ is of type $\atype$, then returns $(b,\atype)$; else, if $\alabel = \_.\alabelshort[{\tt add}]{key,a}$ and $a$ is of type $\atype$, then returns $(b,\atype)$; else, returns $\emptyset$. 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $yield$: 
+\end{itemize}
+
+\[
+  \inferrule[]
+  {(\gstates_0, \avisord_0, \downstreams_0) \xrightarrow{\dwn{\arep}{\alabel_1}} (\gstates_1, \avisord_1, \downstreams_1) \ldots \xrightarrow{\dwn{\arep}{\alabel_k}} (\gstates_k, \avisord_k, \downstreams_k)}
+  {(\gstates_0, \avisord_0, \downstreams_0) \xrightarrow{yield} (\gstates_k, \avisord_k, \downstreams_k)}
+\] 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.keys$ and $EXPR$ is a map: 
+\end{itemize} 
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ type(\aobjid) = map \\ LS(\aobjid).\alabellong[{\tt keys}]{}{S_1}{} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\arep.EXPR.keys \Rightarrow S_1} (\gstates, \avisord, \downstreams)}
+\] 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.length$ and $EXPR$ is a list: 
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ type(\aobjid) = list \\ LS(\aobjid).\alabellong[{\tt length}]{}{j}{} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\arep.EXPR.legnth \Rightarrow j} (\gstates, \avisord, \downstreams)}
+\] 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.values$ and $EXPR$ is a register: 
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ type(\aobjid) = reg \\ LS(\aobjid).\alabellong[{\tt values}]{}{S_1}{} }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\arep.EXPR.values \Rightarrow S_1} (\gstates, \avisord, \downstreams)}
+\] 
+
+\begin{itemize}
+\setlength{\itemsep}{0.5pt}
+\item[-] When replica $\arep$ do $EXPR.type$:
+\end{itemize}
+
+\[
+  \inferrule[]
+  {\gstates(\arep) = (LO, LS, LV, LL) \\ \alabelshort[{\tt C2B}]{EXPR,LS,LV} = \aobjid \\ \exists \atype, such \ that \ (\aobjid,\atype) \in LO }
+  {(\gstates, \avisord, \downstreams) \xrightarrow{\arep.EXPR.type \Rightarrow \atype} (\gstates, \avisord, \downstreams)}
+\] 
